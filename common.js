@@ -31,7 +31,7 @@ const sensor_types = {
   SENSOR_TYPE_UNKNOWN: 				       (18)
 };
 
-const sensors_axes = {
+const sensor_axes = {
   X: 1,
   Y: 2,
   Z: 3
@@ -61,9 +61,11 @@ const sensor_event_types = {
 
 /** struct sensors_vec is used to return a vector in a common format. */
 class sensor_vec {
-	status = 0;
-	reserved = [];
   constructor(v1, v2, v3, type = sensor_value_types.XYZ) {
+    this.status = 0; //setup default vars
+    this.reserved = [];
+
+
     switch(type) {
       case sensor_value_types.XYZ:
         this.x = v1;
@@ -84,8 +86,9 @@ class sensor_vec {
 
 /** struct sensors_color_s is used to return color data in a common format. */
 class sensor_color {
-  rgba = 0; /**< 24-bit RGBA value */
   constructor(v1, v2, v3, type = sensor_value_types.RGB) {
+    this.rgba = 0; /**< 24-bit RGBA value */
+
     switch(type) {
       case sensor_value_types.RGB: /* RGB color space */
         this.r = v1; /**< Red component */
@@ -102,8 +105,9 @@ class sensor_color {
 /* Sensor details (40 bytes) */
 /** struct sensor is used to describe basic information about a specific sensor. */
 class sensor {
-  _autoRange = false;
     constructor(name = "default", version = 1, sensor_id = 1, type = sensor_types.SENSOR_TYPE_UNKNOWN, max_value = 1, min_value = 0, resolution = 1, min_delay = 0) {
+      this._autoRange = false; //set to default value
+
       this.name = name; /**< sensor name */
       this.version = version; /**< version of the hardware + driver */
       this.sensor_id = sensor_id; /**< unique sensor identifier */
@@ -123,11 +127,22 @@ class sensor {
 }
 const sensorReference = sensor; //leave a reference to sensor for other classes to use
 
+/* Device details */
+/** basic information about a device that is not a sensor */
+
+class device {
+  constructor(name = "default", id = 1) {
+    this.name = name;
+    this.id = id;
+  }
+}
+
 /* Sensor event (36 bytes) */
 /** struct sensor_event_s is used to provide a single sensor event in a common format. */
 class sensor_event {
-  reserved0 = 0; /**< reserved */
   constructor(sensor = new sensorReference(), eventType, v1, v2, v3) {
+    this.reserved0 = 0; /**< reserved */
+
     this.version = sensor.version; /**< must be sizeof(struct sensors_event_t) nvm I'm actually going to implement this a bit differently*/
     this.sensor_id = sensor.sensor_id; /**< unique sensor identifier */
     this.type = sensor.type; /**< sensor type */
@@ -222,6 +237,7 @@ module.exports = {
   sensor_types: sensor_types, //sensor types
   sensor_constants: sensor_constants, //sensor constants
   sensor: sensor, //sensor constructor
+  device: device, //device constructor
   sensor_axes: sensor_axes,
   sensor_value_types: sensor_value_types,
   sensor_event_types: sensor_event_types,
