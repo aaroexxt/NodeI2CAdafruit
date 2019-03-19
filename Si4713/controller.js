@@ -11,8 +11,15 @@ const LibCommon = require("../common.js");
 console.log("requiring fakeGPIO lib");
 const GPIO = require("./fakeGPIO.js").Gpio;
 
+console.log("requiring I2C lib");
+const I2C = require('i2c-bus');
+const i2cInterface = I2C.openSync(1);
+const iI = i2cInterface; //shorthand
+
 class Si4713Driver extends LibCommon.device {
 	constructor(pin = -1) {
+		this.i2cBuffer = []; //instantiate new i2c buffer
+
 		super(("Si4713#"+Math.random().toFixed(3)*1000), 1); //call super to set parameters
 
 		this.resetpin = pin;
@@ -24,6 +31,9 @@ class Si4713Driver extends LibCommon.device {
 
 		this.reset();
 		this.powerUp();
+
+		//check for chip
+		
 	}
 	reset() {
 		if (this.resetpin > 0) { //ensure that pin was created correctly
@@ -37,7 +47,10 @@ class Si4713Driver extends LibCommon.device {
 		}
 	}
 	powerUp() {
-
+		
+	}
+	setupBuffer(buffer = []) {
+		this.i2cBuffer = buffer;
 	}
 }
 
