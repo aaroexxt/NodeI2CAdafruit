@@ -9,18 +9,27 @@ console.log("requiring common lib");
 const LibCommon = require("../common.js");
 
 console.log("requiring fakeGPIO lib");
-const GPIO = require("./fakeGPIO.js").Gpio;
+var GPIO = require("./fakeGPIO.js").Gpio;
 
-console.log("requiring I2C lib");
-const I2C = require('./fakeI2C.js');
-const i2cInterface = I2C.openSync(1);
-const iI = i2cInterface; //shorthand
+console.log("requiring fakeI2C lib");
+var I2C = require('./fakeI2C.js');
+var i2cInterface = I2C.openSync(1);
+var iI = i2cInterface; //shorthand
 
 class Si4713Driver extends LibCommon.device {
-	constructor(pin = -1) {
+	constructor(pin = -1, real = false) {
 		super(("Si4713#"+Math.random().toFixed(3)*1000), 1); //call super to set parameters
-
 		this.i2cBuffer = []; //instantiate new i2c buffer
+
+		if (real) { //reload with real libraries
+			console.log("requiring GPIO lib");
+			GPIO = require("onoff").Gpio;
+
+			console.log("requiring I2C lib");
+			I2C = require('i2c-bus');
+			i2cInterface = I2C.openSync(1);
+			iI = i2cInterface; //shorthand
+		}
 
 		this.resetpin = pin;
 		this.resetGPIO = new GPIO(this.resetpin, "out"); //create the pin
@@ -37,6 +46,7 @@ class Si4713Driver extends LibCommon.device {
 		
 	}
 	reset() {
+		console.log("reset called");
 		return new Promise((resolve, reject) => {
 			if (this.resetpin > 0) { //ensure that pin was created correctly
 				this.resetGPIO.writeSync(1);
@@ -51,6 +61,7 @@ class Si4713Driver extends LibCommon.device {
 		})
 	}
 	powerUp() {
+		console.log("powerUp called");
 		return new Promise( (resolve, reject) => {
 			// CTS interrupt disabled
 		    // GPO2 output disabled
