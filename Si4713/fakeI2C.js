@@ -9,6 +9,12 @@ module.exports = {
 		return {
 			i2cWriteSync: function(addr, len, buffer) {
 				console.log("i2cWriteSync called with addr "+addr+", len "+len+", buffer "+JSON.stringify(buffer));
+			},
+			i2cReadSync: function(addr, len, buffer) {
+				console.log("i2cReadSync called with addr"+addr+", len"+len+", buffer "+JSON.stringify(buffer));
+				for (var i=0; i<len; i++) {
+					buffer[i] = -1;
+				}
 			}
 		}
 	}
