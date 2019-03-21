@@ -105,9 +105,9 @@ class Si4713Driver extends LibCommon.device {
     		value & 0xFF
 		])
 	}
-	sendCommand(buffer = -1) {
+	sendCommand(arrayBuffer = -1) {
 		if (typeof buffer != "number") {
-			this.i2cBuffer = buffer;
+			this.i2cBuffer = Buffer.from(arrayBuffer); //create real buffer
 		}
 
 		for (let i=0; i<this.i2cBuffer.length; i++) {
@@ -125,7 +125,7 @@ class Si4713Driver extends LibCommon.device {
 			this.sendCommand([lC.SI4710_CMD_GET_REV,0]); //request rev
 
 			setTimeout( () => {
-				let buffer = [0,0,0,0,0,0,0,0,0,0];
+				let buffer = Buffer.alloc(9); //new buffer of size 9
 				iI.i2cReadSync(this.i2caddr, 9, buffer); //read into buffer
 
 			    //do nothing with first buffer byte
