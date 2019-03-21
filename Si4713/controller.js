@@ -66,8 +66,8 @@ class Si4713Driver extends LibCommon.device {
 					setTimeout( () => {
 						this.resetGPIO.writeSync(1);
 						return resolve();
-					}, 10);
-				},10);
+					}, 25);
+				},25);
 			}
 		})
 	}
