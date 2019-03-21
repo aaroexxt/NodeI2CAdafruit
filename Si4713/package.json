@@ -1,0 +1,24 @@
+{
+  "name": "si4713",
+  "version": "1.0.0",
+  "description": "Driver for si4713",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Aaron Becker",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aaroexxt/NodeI2CAdafruit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/aaroexxt/NodeI2CAdafruit/issues"
+  },
+  "homepage": "https://github.com/aaroexxt/NodeI2CAdafruit#readme",
+  "dependencies": {
+    "i2c-bus": "^4.0.9",
+    "onoff": "^4.1.1"
+  }
+}

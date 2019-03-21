@@ -13,7 +13,7 @@ var GPIO = require("./fakeGPIO.js").Gpio;
 
 console.log("requiring fakeI2C lib");
 var I2C = require('./fakeI2C.js');
-var i2cInterface = I2C.openSync(1);
+var i2cInterface = I2C.openSync(3, {forceAccess: true});
 var iI = i2cInterface; //shorthand
 
 class Si4713Driver extends LibCommon.device {
@@ -33,6 +33,11 @@ class Si4713Driver extends LibCommon.device {
 
 		this.resetpin = pin;
 		this.resetGPIO = new GPIO(this.resetpin, "out"); //create the pin
+
+		process.on('SIGINT', () => {
+			console.log("unexport gpio");
+		  	this.resetGPIO.unexport(); //unexport GPIO
+		});
 	}
 	begin(addr = lC.SI4710_ADDR1) {
 		console.log("begin called w/addr "+addr);
@@ -44,6 +49,12 @@ class Si4713Driver extends LibCommon.device {
 
 		//check for chip
 		
+	}
+	end() {
+		console.log("unexporting gpio");
+		this.resetGPIO.unexport();
+		console.log("freeing i2c bus");
+		iI.closeSync();
 	}
 	reset() {
 		console.log("reset called");
@@ -68,8 +79,9 @@ class Si4713Driver extends LibCommon.device {
 		    // Boot normally
 		    // xtal oscillator ENabled
 		    // FM transmit
+		    console.log("pre sendCommand");
 			this.sendCommand([lC.SI4710_CMD_POWER_UP, 0x12, 0x50]); //send startup command
-
+			console.log("post sendCommand");
 			// configuration! see page 254
 		    this.setProperty(lC.SI4713_PROP_REFCLK_FREQ, 32768);  // crystal is 32.768
 		    this.setProperty(lC.SI4713_PROP_TX_PREEMPHASIS, 0); // 74uS pre-emph (USA std)
