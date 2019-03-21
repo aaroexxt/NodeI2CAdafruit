@@ -9,7 +9,7 @@ class scanner {
 
       for (let addr = 0; addr <= 127; addr += 1) {
         if (addr % 16 === 0) {
-          console.log('\n' + (addr === 0 ? '0' : ''));
+          console.log((addr === 0 ? '0' : ''));
           console.log(addr.toString(16) + ':');
         }
 
