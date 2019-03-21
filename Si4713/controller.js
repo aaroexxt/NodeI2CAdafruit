@@ -114,7 +114,11 @@ class Si4713Driver extends LibCommon.device {
 			console.log("sending i2c command: "+this.i2cBuffer[i]);
 		}
 		
-		iI.i2cWriteSync(this.i2caddr, this.i2cBuffer.length, this.i2cBuffer); //writes buffer to i2c addr
+		try {
+			iI.i2cWriteSync(this.i2caddr, this.i2cBuffer.length, this.i2cBuffer); //writes buffer to i2c addr
+		} catch(e) {
+			console.error("failed to send i2c command: e="+e);
+		}
 	}
 	getRev() {
 		return new Promise( (resolve, reject) => {
