@@ -22,12 +22,14 @@ class Si4713Driver extends LibCommon.device {
 		this.i2cBuffer = []; //instantiate new i2c buffer
 
 		if (real) { //reload with real libraries
+			console.log("running scanner");
+			let scan = require("./scanner.js");
 			console.log("requiring GPIO lib");
 			GPIO = require("onoff").Gpio;
 
 			console.log("requiring I2C lib");
 			I2C = require('i2c-bus');
-			i2cInterface = I2C.openSync(1);
+			i2cInterface = I2C.openSync(3);
 			iI = i2cInterface; //shorthand
 		}
 
@@ -119,7 +121,7 @@ class Si4713Driver extends LibCommon.device {
 			this.sendCommand([lC.SI4710_CMD_GET_REV,0]); //request rev
 
 			setTimeout( () => {
-				let buffer = [0,0,0,0,0,0,0,0,0];
+				let buffer = [0,0,0,0,0,0,0,0,0,0];
 				iI.i2cReadSync(this.i2caddr, 9, buffer); //read into buffer
 
 			    //do nothing with first buffer byte
