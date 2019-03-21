@@ -15,6 +15,18 @@ module.exports = {
 				for (var i=0; i<len; i++) {
 					buffer[i] = -1;
 				}
+			},
+			writeQuickSync: function(addr, val) {
+				console.log("writeQuickSync called with addr "+addr+" val "+val);
+				return true;
+			},
+			i2cFuncsSync: function() {
+				return {
+					smbusQuick: true
+				}
+			},
+			closeSync: function(bus_id) {
+				console.log("closed i2c bus w/bus id "+bus_id);
 			}
 		}
 	}

@@ -1,4 +1,5 @@
 //Libraries
+const debugMode = false;
 
 console.log("initializing Si4713lib");
 console.log("requiring constants");
@@ -16,14 +17,20 @@ var I2C = require('./fakeI2C.js');
 var i2cInterface = I2C.openSync(3, {forceAccess: true});
 var iI = i2cInterface; //shorthand
 
+const debugLog = (log) => {
+	if (debugMode) {
+		if (typeof log == "object") {
+
+		}
+	}
+}
+
 class Si4713Driver extends LibCommon.device {
 	constructor(pin = -1, real = false) {
 		super(("Si4713#"+Math.random().toFixed(3)*1000), 1); //call super to set parameters
 		this.i2cBuffer = []; //instantiate new i2c buffer
 
 		if (real) { //reload with real libraries
-			console.log("running scanner");
-			let scan = require("./scanner.js");
 			console.log("requiring GPIO lib");
 			GPIO = require("onoff").Gpio;
 
