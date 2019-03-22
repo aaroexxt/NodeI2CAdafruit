@@ -49,12 +49,25 @@ class Si4713Driver extends LibCommon.device {
 		});
 	}
 	begin(addr = lC.SI4710_ADDR1) {
-		console.log("begin called w/addr "+addr);
-		this.i2caddr = addr;
+		return new Promise( (resolve, reject) => {
+			console.log("begin called w/addr "+addr);
+			this.i2caddr = addr;
 
-		this.reset()
-		.then(() => this.powerUp().then(() => this.getRev().then(rev => console.log("CHIP REV (SHOULD BE 13)=="+rev))))
-		.catch(e => console.error)
+			this.reset()
+			.then(() => this.powerUp().then(() => this.getRev().then(rev => {
+				if (rev == 13) {
+					debugLog("Si4713 found successfully on address "+this.i2caddr);
+					return resolve(true);
+				} else {
+					debugLog("No si4713 found successfully, rev="+rev);
+					return resolve(false);
+				}
+			})))
+			.catch(e => {
+				console.error(e);
+				reject(e);
+			})
+		})
 
 		//check for chip
 		
@@ -157,6 +170,27 @@ class Si4713Driver extends LibCommon.device {
 			    resolve(pn);
 			},100);
 		});
+	}
+
+	tuneFM(freqKHz = 10190) {
+		return new Promise( (resolve, reject) => {
+			debugLog("tuning to FM freq "+(freqKHZ/100));
+			this.sendCommand([
+				lC.SI4713_CMD_TX_TUNE_FREQ,
+				0,
+				freqKHz >> 8,
+				freqKHz
+			]);
+
+			this.whenStatusIs(0x81).then( () => resolve())
+			.catch( e => reject(e));
+		})
+	}
+
+	whenStatusIs(status, maxTimeout = 30000) { //maxTimeout is maximum time that function will wait before rejecting
+		return new Promise( (resolve, reject) => {
+			debugLog("")
+		}) 
 	}
 }
 
