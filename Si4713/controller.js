@@ -114,6 +114,7 @@ class Si4713Driver extends LibCommon.device {
 		    setTimeout( () => resolve(), 100);
 		})
 	}
+
 	setProperty(property, value) {
 		console.log("set property: "+property+", value: "+value);
 		this.sendCommand([
@@ -125,6 +126,7 @@ class Si4713Driver extends LibCommon.device {
     		value & 0xFF
 		])
 	}
+
 	sendCommand(arrayBuffer = -1) {
 		if (typeof buffer != "number") {
 			this.i2cBuffer = Buffer.from(arrayBuffer); //create real buffer
@@ -182,14 +184,71 @@ class Si4713Driver extends LibCommon.device {
 				freqKHz
 			]);
 
-			this.whenStatusIs(0x81).then( () => resolve())
+			this.whenStatusIs(0x81).then(() => resolve())
 			.catch( e => reject(e));
 		})
 	}
 
-	whenStatusIs(status, maxTimeout = 30000) { //maxTimeout is maximum time that function will wait before rejecting
+	setTXpower(pwr, antcap) {
+		this.sendCommand([
+			lC.SI4710_CMD_TX_TUNE_POWER,
+			0,
+			0,
+			pwr,
+			antcap
+		])
+	}
+
+	beginRDS(programID) {
+		// 66.25KHz (default is 68.25)
+		this.setProperty(lC.SI4713_PROP_TX_AUDIO_DEVIATION, 6625); 
+
+		// 2KHz (default)  
+		this.setProperty(lC.SI4713_PROP_TX_RDS_DEVIATION, 200); 
+
+		// RDS IRQ 
+		this.setProperty(lC.SI4713_PROP_TX_RDS_INTERRUPT_SOURCE, 0x0001); 
+		// program identifier
+		this.setProperty(lC.SI4713_PROP_TX_RDS_PI, programID);
+		// 50% mix (default)
+		this.setProperty(lC.SI4713_PROP_TX_RDS_PS_MIX, 0x03);
+		// RDSD0 & RDSMS (default)
+		this.setProperty(lC.SI4713_PROP_TX_RDS_PS_MISC, 0x1808); 
+		// 3 repeats (default)
+		this.setProperty(lC.SI4713_PROP_TX_RDS_PS_REPEAT_COUNT, 3); 
+
+		this.setProperty(lC.SI4713_PROP_TX_RDS_MESSAGE_COUNT, 1);
+		this.setProperty(lC.SI4713_PROP_TX_RDS_PS_AF, 0xE0E0); // no AF
+		this.setProperty(lC.SI4713_PROP_TX_RDS_FIFO_SIZE, 0);
+
+		this.setProperty(lC.SI4713_PROP_TX_COMPONENT_ENABLE, 0x0007);
+	}
+
+	setGPIOctrl(x) {
+		this.sendCommand([lC.SI4710_CMD_GPO_CTL,x]);
+	}
+
+	setGPIO(x) {
+		this.sendCommand([lC.SI4710_CMD_GPO_SET,x]);
+	}
+
+	whenStatusIs(status = 0x81, maxTimeout = 30000) { //maxTimeout is maximum time that function will wait before rejecting
 		return new Promise( (resolve, reject) => {
-			debugLog("")
+			this.sendCommand([SI4710_CMD_GET_INT_STATUS]);
+			let cSInterval = setInterval(() => {
+				let buffer = Buffer.alloc(1); //new buffer to alloc
+				let amountBytes = iI.i2cReadSync(this.i2caddr, 1, buffer); //read a single status byte
+				let res = result[0] & status;
+				console.log("res="+res+", amntBytes="+amountBytes);
+				if (res || amountBytes > 0) {
+					clearInterval(cSInterval);
+					return resolve();
+				}
+			})
+			setTimeout(() => {
+				clearInterval(cSInterval);
+				return reject();
+			}, maxTimeout)
 		}) 
 	}
 }
