@@ -205,7 +205,7 @@ class Si4713Driver extends LibCommon.device {
 		return new Promise( (resolve, reject) => {
 			this.sendCommand([lC.SI4710_CMD_TX_ASQ_STATUS, 0x1]);
 
-			let buffer = Buffer.alloc(5); //new buffer of size 4
+			var buffer = Buffer.alloc(5); //new buffer of size 4
 			iI.i2cReadSync(this.i2caddr, 5, buffer); //read into buffer
 			debugLog("ASQBuf "+JSON.stringify(buffer));
 
@@ -223,13 +223,11 @@ class Si4713Driver extends LibCommon.device {
 		return new Promise( (resolve, reject) => {
 			this.sendCommand([lC.SI4710_CMD_TX_TUNE_STATUS, 0x1]);
 
-			let buff = Buffer.alloc(8); //new buffer of size 8
-			iI.i2cReadSync(this.i2caddr, 8, buff); //read into buffer
+			var buffer = Buffer.alloc(8); //new buffer of size 8
+			iI.i2cReadSync(this.i2caddr, 8, buffer); //read into buffer
 			debugLog("tuneStatusBuf "+JSON.stringify(buffer));
 
-			var buffer = JSON.stringify(buff).data;
-
-			let currFreq = buffer[2];
+			var currFreq = buffer[2];
 			currFreq <<= 8;
 			currFreq |= buffer[3];
 
