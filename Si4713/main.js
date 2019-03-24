@@ -33,8 +33,17 @@ scanner.scan(0x3, 0x77).then( () => { //needs to happen before device begin/end 
 							current+=10;
 							if (current < max) {
 								measureFreq(current); //recurring
+							} else {
+								measureLineIn();
 							}
 						})
+					})
+				}
+
+				function measureLineIn() {
+					radio.readASQ().then((stat) => {
+						console.log("ASQ: "+stat.currASQ+", InLevel: "+stat.currInLevel);
+						setTimeout(() => measureLineIn(), 100);
 					})
 				}
 
