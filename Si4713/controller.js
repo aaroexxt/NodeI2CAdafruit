@@ -132,8 +132,7 @@ class Si4713Driver extends LibCommon.device {
 		if (typeof buffer != "number") {
 			var i2cBuffer = Buffer.from(arrayBuffer); //create real buffer
 			iI.i2cWriteSync(this.i2caddr, i2cBuffer.length, i2cBuffer); //writes buffer to i2c addr
-			setTimeout(()=>{})
-
+			
 			if (debugMode) {
 				for (const b of i2cBuffer) {
 					console.log("Sending i2cCommand: "+b);
@@ -149,32 +148,31 @@ class Si4713Driver extends LibCommon.device {
 		return new Promise( (resolve, reject) => {
 			this.sendCommand([lC.SI4710_CMD_GET_REV,0]); //request rev
 
-			setTimeout( () => {
-				let buffer = Buffer.alloc(9); //new buffer of size 9
-				iI.i2cReadSync(this.i2caddr, 9, buffer); //read into buffer
-				debugLog("revBuf "+JSON.stringify(buffer));
+			let buffer = Buffer.alloc(9); //new buffer of size 9
+			iI.i2cReadSync(this.i2caddr, 9, buffer); //read into buffer
+			debugLog("revBuf "+JSON.stringify(buffer));
 
-			    //do nothing with first buffer byte
-			    let pn = buffer[1];
-			    let fw =  buffer[2];
-			    fw <<= 8;
-			    fw |= buffer[3];
-			    let patch = buffer[4];
-			    patch <<= 8;
-			    patch |= buffer[5];
-			    let cmp = buffer[6];
-			    cmp <<= 8;
-			    cmp |= buffer[7];
-			    let chiprev = buffer[8];
-			    
-			    debugLog("Part # Si47"+pn+"-"+fw);
-			    
-			    debugLog("Firmware 0x"+fw);
-			    debugLog("Patch 0x"+patch);
-			    debugLog("Chip rev "+chiprev);
+		    //do nothing with first buffer byte
+		    let pn = buffer[1];
+		    let fw =  buffer[2];
+		    fw <<= 8;
+		    fw |= buffer[3];
+		    let patch = buffer[4];
+		    patch <<= 8;
+		    patch |= buffer[5];
+		    let cmp = buffer[6];
+		    cmp <<= 8;
+		    cmp |= buffer[7];
+		    let chiprev = buffer[8];
+		    
+		    debugLog("Part # Si47"+pn+"-"+fw);
+		    
+		    debugLog("Firmware 0x"+fw);
+		    debugLog("Patch 0x"+patch);
+		    debugLog("Chip rev "+chiprev);
 
-			    resolve(pn);
-			},100);
+		    resolve(pn);
+
 		});
 	}
 
@@ -207,18 +205,16 @@ class Si4713Driver extends LibCommon.device {
 		return new Promise( (resolve, reject) => {
 			this.sendCommand([lC.SI4710_CMD_TX_ASQ_STATUS, 0x1]);
 
-			setTimeout(() => {
-				let buffer = Buffer.alloc(5); //new buffer of size 4
-				iI.i2cReadSync(this.i2caddr, 5, buffer); //read into buffer
-				debugLog("ASQBuf "+JSON.stringify(buffer));
+			let buffer = Buffer.alloc(5); //new buffer of size 4
+			iI.i2cReadSync(this.i2caddr, 5, buffer); //read into buffer
+			debugLog("ASQBuf "+JSON.stringify(buffer));
 
-				this.currASQ = buffer[1]; //set local properties
-				this.currInLevel = buffer[4];
-				return resolve({
-					currASQ: buffer[1],
-					currInLevel: buffer[4]
-				});
-			},100);
+			this.currASQ = buffer[1]; //set local properties
+			this.currInLevel = buffer[4];
+			return resolve({
+				currASQ: buffer[1],
+				currInLevel: buffer[4]
+			});
 		})
 	}
 
@@ -227,27 +223,25 @@ class Si4713Driver extends LibCommon.device {
 		return new Promise( (resolve, reject) => {
 			this.sendCommand([lC.SI4710_CMD_TX_TUNE_STATUS, 0x1]);
 
-			setTimeout(() => {
-				let buffer = Buffer.alloc(8); //new buffer of size 8
-				iI.i2cReadSync(this.i2caddr, 8, buffer); //read into buffer
-				debugLog("tuneStatusBuf "+JSON.stringify(buffer));
+			let buffer = Buffer.alloc(8); //new buffer of size 8
+			iI.i2cReadSync(this.i2caddr, 8, buffer); //read into buffer
+			debugLog("tuneStatusBuf "+JSON.stringify(buffer));
 
-				let currFreq = buffer[2];
-				currFreq <<= 8;
-				currFreq |= buffer[3];
+			let currFreq = buffer[2];
+			currFreq <<= 8;
+			currFreq |= buffer[3];
 
-				this.currFreq = currFreq; //set local properties
-				this.currdBuV = buffer[5];
-				this.currAntCap = buffer[6];
-				this.currNoiseLevel = buffer[7];
+			this.currFreq = currFreq; //set local properties
+			this.currdBuV = buffer[5];
+			this.currAntCap = buffer[6];
+			this.currNoiseLevel = buffer[7];
 
-				return resolve({
-					currFreq: currFreq,
-					currdBuV: buffer[5],
-					currAntCap: buffer[6],
-					currNoiseLevel: buffer[7]
-				});
-			},100);
+			return resolve({
+				currFreq: currFreq,
+				currdBuV: buffer[5],
+				currAntCap: buffer[6],
+				currNoiseLevel: buffer[7]
+			});
 		})
 	}
 
@@ -342,7 +336,7 @@ class Si4713Driver extends LibCommon.device {
 		this.sendCommand([lC.SI4710_CMD_GPO_SET,x]);
 	}
 
-	whenStatusIs(status = 0x81, maxTimeout = 1000) { //maxTimeout is maximum time that function will wait before rejecting
+	whenStatusIs(status = 0x81, maxTimeout = 500) { //maxTimeout is maximum time that function will wait before rejecting
 		return new Promise( (resolve, reject) => {
 			this.sendCommand([lC.SI4710_CMD_GET_INT_STATUS]);
 			let cSInterval = setInterval(() => {
@@ -353,7 +347,7 @@ class Si4713Driver extends LibCommon.device {
 					clearInterval(cSInterval);
 					return resolve();
 				}
-			})
+			},50);
 			setTimeout(() => {
 				clearInterval(cSInterval);
 				return reject();
