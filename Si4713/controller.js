@@ -180,7 +180,7 @@ class Si4713Driver extends LibCommon.device {
 
 	tuneFM(freqKHz = 10190) {
 		return new Promise( (resolve, reject) => {
-			debugLog("tuning to FM freq "+(freqKHZ/100));
+			debugLog("tuning to FM freq "+(freqKHz/100));
 			this.sendCommand([
 				lC.SI4713_CMD_TX_TUNE_FREQ,
 				0,
@@ -342,12 +342,12 @@ class Si4713Driver extends LibCommon.device {
 
 	whenStatusIs(status = 0x81, maxTimeout = 1000) { //maxTimeout is maximum time that function will wait before rejecting
 		return new Promise( (resolve, reject) => {
-			this.sendCommand([SI4710_CMD_GET_INT_STATUS]);
+			this.sendCommand([lC.SI4710_CMD_GET_INT_STATUS]);
 			let cSInterval = setInterval(() => {
 				let buffer = Buffer.alloc(1); //new buffer to alloc
 				let amountBytes = iI.i2cReadSync(this.i2caddr, 1, buffer); //read a single status byte
-				let res = result[0] & status;
-				debugLog("res="+res+", amntBytes="+amountBytes);
+				let res = buffer[0] & status;
+				console.log("res="+res+", amntBytes="+amountBytes);
 				if (res || amountBytes > 0) {
 					clearInterval(cSInterval);
 					return resolve();

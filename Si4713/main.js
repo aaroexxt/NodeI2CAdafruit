@@ -40,7 +40,7 @@ scanner.scan(0x3, 0x77).then( () => { //needs to happen before device begin/end 
 
 				measureFreq(current); //start scan
 			}).catch( e => {
-				console.error("tune failed");
+				console.error("tune failed, e="+e);
 			});
 		} else {
 			console.log("Radio failed to connect, terminating :(");
