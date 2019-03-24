@@ -153,6 +153,7 @@ class Si4713Driver extends LibCommon.device {
 			setTimeout( () => {
 				let buffer = Buffer.alloc(9); //new buffer of size 9
 				iI.i2cReadSync(this.i2caddr, 9, buffer); //read into buffer
+				debugLog("revBuf "+JSON.stringify(buffer));
 
 			    //do nothing with first buffer byte
 			    let pn = buffer[1];
@@ -210,6 +211,7 @@ class Si4713Driver extends LibCommon.device {
 			setTimeout(() => {
 				let buffer = Buffer.alloc(5); //new buffer of size 4
 				iI.i2cReadSync(this.i2caddr, 5, buffer); //read into buffer
+				debugLog("ASQBuf "+JSON.stringify(buffer));
 
 				this.currASQ = buffer[1]; //set local properties
 				this.currInLevel = buffer[4];
@@ -229,6 +231,7 @@ class Si4713Driver extends LibCommon.device {
 			setTimeout(() => {
 				let buffer = Buffer.alloc(8); //new buffer of size 8
 				iI.i2cReadSync(this.i2caddr, 8, buffer); //read into buffer
+				debugLog("tuneStatusBuf "+JSON.stringify(buffer));
 
 				let currFreq = buffer[2];
 				currFreq <<= 8;
