@@ -222,27 +222,25 @@ class Si4713Driver extends LibCommon.device {
 		return new Promise( (resolve, reject) => {
 			this.sendCommand([lC.SI4710_CMD_TX_TUNE_STATUS, 0x1]);
 
-			setTimeout(() => {
-				var buffer = Buffer.alloc(8); //new buffer of size 8
-				iI.i2cReadSync(this.i2caddr, 8, buffer); //read into buffer
-				debugLog("tuneStatusBuf "+JSON.stringify(buffer));
+			var buffer = Buffer.alloc(8); //new buffer of size 8
+			iI.i2cReadSync(this.i2caddr, 8, buffer); //read into buffer
+			debugLog("tuneStatusBuf "+JSON.stringify(buffer));
 
-				var currFreq = buffer[2];
-				currFreq <<= 8;
-				currFreq |= buffer[3];
+			var currFreq = buffer[2];
+			currFreq <<= 8;
+			currFreq |= buffer[3];
 
-				this.currFreq = currFreq; //set local properties
-				this.currdBuV = buffer[5];
-				this.currAntCap = buffer[6];
-				this.currNoiseLevel = buffer[7];
+			this.currFreq = currFreq; //set local properties
+			this.currdBuV = buffer[5];
+			this.currAntCap = buffer[6];
+			this.currNoiseLevel = buffer[7];
 
-				return resolve({
-					currFreq: currFreq,
-					currdBuV: buffer[5],
-					currAntCap: buffer[6],
-					currNoiseLevel: buffer[7]
-				});
-			},200);
+			return resolve({
+				currFreq: currFreq,
+				currdBuV: buffer[5],
+				currAntCap: buffer[6],
+				currNoiseLevel: buffer[7]
+			});
 		})
 	}
 
