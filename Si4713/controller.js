@@ -228,6 +228,67 @@ class Si4713Driver extends LibCommon.device {
 		this.setProperty(lC.SI4713_PROP_TX_COMPONENT_ENABLE, 0x0007);
 	}
 
+	setRDSStation(s) {
+		let slots = (s.length+3) / 4;
+
+		let sOffset = 0;
+		for (let i=0; i<slots; i++) {
+			let sSelection = s.substring(sOffset, sOffset+4);
+			this.sendCommand([
+				lC.SI4710_CMD_TX_RDS_PS,
+				i,
+				sSelection[0],
+				sSelection[1],
+				sSelection[2],
+				sSelection[3],
+				0
+			]);
+			sOffset+=4;
+		}
+	}
+
+	setRDSBuffer(s) {
+		let slots = (s.length+3) / 4;
+
+		let sOffset = 0;
+		for (let i=0; i<slots; i++) {
+			let sSelection = s.substring(sOffset, sOffset+4);
+			this.sendCommand([
+				lC.SI4710_CMD_TX_RDS_BUFF,
+				((i == 0) ? 0x06 : 0x04),
+				0x20,
+				i,
+				sSelection[0],
+				sSelection[1],
+				sSelection[2],
+				sSelection[3]
+			]);
+			sOffset+=4;
+		}
+
+  for (uint8_t i=0; i<slots; i++) {
+    memset(_i2ccommand, ' ', 8); // clear it with ' '
+    memcpy(_i2ccommand+4, s, min(4, strlen(s)));
+    s+=4;
+    _i2ccommand[8] = 0;
+    //Serial.print("Set buff #"); Serial.print(i); 
+    //char *slot = (char *)( _i2ccommand+4);
+    //Serial.print(" to '"); Serial.print(slot); Serial.println("'");
+    _i2ccommand[0] = SI4710_CMD_TX_RDS_BUFF;
+    if (i == 0)
+      _i2ccommand[1] = 0x06;
+    else
+      _i2ccommand[1] = 0x04;
+
+    _i2ccommand[2] = 0x20;
+    _i2ccommand[3] = i;
+    sendCommand(8);
+  }
+
+  		debugLog("RDS Enable");
+		this.setProperty(lC.SI4713_PROP_TX_COMPONENT_ENABLE, 0x0007); // stereo, pilot+rds
+	}
+
 	setGPIOctrl(x) {
 		this.sendCommand([lC.SI4710_CMD_GPO_CTL,x]);
 	}
