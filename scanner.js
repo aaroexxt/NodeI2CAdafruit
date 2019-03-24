@@ -3,7 +3,7 @@ var i2c, i2c1 = 0;
 const EBUSY = 16; /* Device or resource busy */
 
 class scanner {
-	constructor(runReal) {
+	constructor(runReal = true) {
 		if (runReal) {
 			i2c = require('i2c-bus');
 		} else {

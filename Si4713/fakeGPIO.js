@@ -11,5 +11,8 @@ module.exports = {
 		this.writeSync = function(pwr) {
 			console.log("writing to GPIO at pin "+this.pin+", and "+this.mode+" with new power "+pwr);
 		}
+		this.unexport = function() {
+			console.log("unexporting GPIO pin"+this.pin)
+		}
 	}
 }
