@@ -130,7 +130,8 @@ class Si4713Driver extends LibCommon.device {
 
 	sendCommand(arrayBuffer = -1) {
 		if (typeof buffer != "number") {
-			let i2cBuffer = Buffer.from(arrayBuffer); //create real buffer
+			var i2cBuffer = Buffer.from(arrayBuffer); //create real buffer
+			console.log(i2cBuffer)
 		} else {
 			console.error("Buffer is a number");
 		}
