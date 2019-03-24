@@ -132,7 +132,7 @@ class Si4713Driver extends LibCommon.device {
 		if (typeof buffer != "number") {
 			var i2cBuffer = Buffer.from(arrayBuffer); //create real buffer
 			iI.i2cWriteSync(this.i2caddr, i2cBuffer.length, i2cBuffer); //writes buffer to i2c addr
-			
+
 			if (debugMode) {
 				for (const b of i2cBuffer) {
 					console.log("Sending i2cCommand: "+b);
@@ -223,9 +223,11 @@ class Si4713Driver extends LibCommon.device {
 		return new Promise( (resolve, reject) => {
 			this.sendCommand([lC.SI4710_CMD_TX_TUNE_STATUS, 0x1]);
 
-			let buffer = Buffer.alloc(8); //new buffer of size 8
-			iI.i2cReadSync(this.i2caddr, 8, buffer); //read into buffer
+			let buff = Buffer.alloc(8); //new buffer of size 8
+			iI.i2cReadSync(this.i2caddr, 8, buff); //read into buffer
 			debugLog("tuneStatusBuf "+JSON.stringify(buffer));
+
+			var buffer = JSON.stringify(buff).data;
 
 			let currFreq = buffer[2];
 			currFreq <<= 8;
