@@ -1,7 +1,5 @@
-//Libraries
-const debugMode = false;
-
 //Debugging
+var debugMode; //will be overridden in constructor
 const debugLog = (log) => {
 	if (debugMode) {
 		if (typeof log == "object") {
@@ -12,6 +10,7 @@ const debugLog = (log) => {
 	}
 }
 
+//Libraries
 debugLog("initializing Si4713lib");
 debugLog("requiring constants");
 const LibConstants = require("./const.js");
