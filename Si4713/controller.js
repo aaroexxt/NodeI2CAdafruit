@@ -203,6 +203,68 @@ class Si4713Driver extends LibCommon.device {
 		])
 	}
 
+	readASQ() {
+		return new Promise( (resolve, reject) => {
+			this.sendCommand([lC.SI4710_CMD_TX_ASQ_STATUS, 0x1]);
+
+			setTimeout(() => {
+				let buffer = Buffer.alloc(5); //new buffer of size 4
+				iI.i2cReadSync(this.i2caddr, 5, buffer); //read into buffer
+
+				this.currASQ = buffer[1]; //set local properties
+				this.currInLevel = buffer[4];
+				return resolve({
+					currASQ: buffer[1],
+					currInLevel: buffer[4]
+				});
+			},100);
+		})
+	}
+
+	//RPS
+	readTuneStatus() {
+		return new Promise( (resolve, reject) => {
+			this.sendCommand([lC.SI4710_CMD_TX_TUNE_STATUS, 0x1]);
+
+			setTimeout(() => {
+				let buffer = Buffer.alloc(8); //new buffer of size 8
+				iI.i2cReadSync(this.i2caddr, 8, buffer); //read into buffer
+
+				let currFreq = buffer[2];
+				currFreq <<= 8;
+				currFreq |= buffer[3];
+
+				this.currFreq = currFreq; //set local properties
+				this.currdBuV = buffer[5];
+				this.currAntCap = buffer[6];
+				this.currNoiseLevel = buffer[7];
+
+				return resolve({
+					currFreq: currFreq,
+					currdBuV: buffer[5],
+					currAntCap: buffer[6],
+					currNoiseLevel: buffer[7]
+				});
+			},100);
+		})
+	}
+
+	readTuneMeasure(freq) {
+		//check freq is multiple of 50khz
+		freq = ( ((freq % 5) == 0) ? freq : (freq - (freq % 5)) );
+
+		debugLog("Measuring "+freq+" freq");
+		this.sendCommand([
+			lC.SI4710_CMD_TX_TUNE_MEASURE,
+			0,
+			freq >> 8,
+			freq,
+			0
+		]);
+
+		return this.whenStatusIs(0x81); //return promise
+	}
+
 	beginRDS(programID) {
 		// 66.25KHz (default is 68.25)
 		this.setProperty(lC.SI4713_PROP_TX_AUDIO_DEVIATION, 6625); 
@@ -266,25 +328,6 @@ class Si4713Driver extends LibCommon.device {
 			sOffset+=4;
 		}
 
-  for (uint8_t i=0; i<slots; i++) {
-    memset(_i2ccommand, ' ', 8); // clear it with ' '
-    memcpy(_i2ccommand+4, s, min(4, strlen(s)));
-    s+=4;
-    _i2ccommand[8] = 0;
-    //Serial.print("Set buff #"); Serial.print(i); 
-    //char *slot = (char *)( _i2ccommand+4);
-    //Serial.print(" to '"); Serial.print(slot); Serial.println("'");
-    _i2ccommand[0] = SI4710_CMD_TX_RDS_BUFF;
-    if (i == 0)
-      _i2ccommand[1] = 0x06;
-    else
-      _i2ccommand[1] = 0x04;
-
-    _i2ccommand[2] = 0x20;
-    _i2ccommand[3] = i;
-    sendCommand(8);
-  }
-
   		debugLog("RDS Enable");
 		this.setProperty(lC.SI4713_PROP_TX_COMPONENT_ENABLE, 0x0007); // stereo, pilot+rds
 	}
@@ -297,7 +340,7 @@ class Si4713Driver extends LibCommon.device {
 		this.sendCommand([lC.SI4710_CMD_GPO_SET,x]);
 	}
 
-	whenStatusIs(status = 0x81, maxTimeout = 30000) { //maxTimeout is maximum time that function will wait before rejecting
+	whenStatusIs(status = 0x81, maxTimeout = 1000) { //maxTimeout is maximum time that function will wait before rejecting
 		return new Promise( (resolve, reject) => {
 			this.sendCommand([SI4710_CMD_GET_INT_STATUS]);
 			let cSInterval = setInterval(() => {
