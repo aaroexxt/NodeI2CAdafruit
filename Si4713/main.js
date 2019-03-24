@@ -1,5 +1,5 @@
 let runReal = process.argv[2] == "true";
-let debugMode = process.argv[2] == "true";
+let debugMode = process.argv[3] == "true";
 
 const driver = require("./controller.js");
 const scannerLib = require("../scanner.js");
