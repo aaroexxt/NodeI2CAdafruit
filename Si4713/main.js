@@ -24,7 +24,7 @@ scanner.scan(0x3, 0x77).then( () => { //needs to happen before device begin/end 
 				radio.setRDSbuffer("Aaron's Radio Station Test");
 
 				var current = 8750;
-				var max = 8770//10800;
+				var max = 10800//10800;
 
 				function measureFreq(f) {
 					radio.readTuneMeasure(f).then( () => {
