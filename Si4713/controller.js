@@ -29,8 +29,9 @@ var i2cInterface = I2C.openSync(3, {forceAccess: true});
 var iI = i2cInterface; //shorthand
 
 class Si4713Driver extends LibCommon.device {
-	constructor(pin = -1, real = true) {
+	constructor(pin = -1, real = true, dM = false) {
 		super(("Si4713#"+Math.random().toFixed(3)*1000), 1); //call super to set parameters
+		debugMode = dM; //setup debugMode
 		this.i2cBuffer = []; //instantiate new i2c buffer
 
 		if (real) { //reload with real libraries
