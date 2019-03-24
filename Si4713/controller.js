@@ -131,22 +131,18 @@ class Si4713Driver extends LibCommon.device {
 	sendCommand(arrayBuffer = -1) {
 		if (typeof buffer != "number") {
 			var i2cBuffer = Buffer.from(arrayBuffer); //create real buffer
-			//console.log(i2cBuffer)
+			iI.i2cWriteSync(this.i2caddr, i2cBuffer.length, i2cBuffer); //writes buffer to i2c addr
+
+			if (debugMode) {
+				for (const b of i2cBuffer) {
+					console.log("Sending i2cCommand: "+b);
+				}
+			}
+
+			return i2cBuffer;
 		} else {
 			console.error("Buffer is a number");
 		}
-
-		for (const b of i2cBuffer) {
-			console.log("Sending i2cCommand: "+b);
-		}
-		
-		try {
-			iI.i2cWriteSync(this.i2caddr, i2cBuffer.length, i2cBuffer); //writes buffer to i2c addr
-		} catch(e) {
-			console.error("failed to send i2c buffer: e="+e);
-		}
-
-		return i2cBuffer;
 	}
 	getRev() {
 		return new Promise( (resolve, reject) => {
