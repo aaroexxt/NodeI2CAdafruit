@@ -13,7 +13,7 @@ scanner.scan(0x3, 0x77).then( () => { //needs to happen before device begin/end 
 			console.log("Radio connected successfully!");
 
 			console.log("Setting TX power");
-			radio.setTXPower(115); //setting tx power
+			radio.setTXpower(115); //setting tx power
 			radio.tuneFM(10190).then( () => {
 				console.log("tuned successfully");
 

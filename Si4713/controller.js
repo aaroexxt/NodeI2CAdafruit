@@ -193,14 +193,14 @@ class Si4713Driver extends LibCommon.device {
 		})
 	}
 
-	setTXpower(pwr, antcap) {
+	setTXpower(pwr = 115, antcap) {
 		this.sendCommand([
 			lC.SI4710_CMD_TX_TUNE_POWER,
 			0,
 			0,
 			pwr,
 			antcap
-		])
+		]);
 	}
 
 	readASQ() {
