@@ -28,10 +28,8 @@ scanner.scan(0x3, 0x77).then( () => { //needs to happen before device begin/end 
 
 				function measureFreq(f) {
 					radio.readTuneMeasure(f).then( () => {
-						console.log("Measuring "+f+"...");
 						radio.readTuneStatus().then((status) => {
-							console.log("currNoiseLevel: "+status.currNoiseLevel);
-							console.log(radio)
+							console.log(f+"freq, currNoiseLevel: "+status.currNoiseLevel);
 							current+=10;
 							if (current < max) {
 								measureFreq(current); //recurring
