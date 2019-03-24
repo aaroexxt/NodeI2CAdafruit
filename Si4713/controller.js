@@ -290,7 +290,7 @@ class Si4713Driver extends LibCommon.device {
 		this.setProperty(lC.SI4713_PROP_TX_COMPONENT_ENABLE, 0x0007);
 	}
 
-	setRDSStation(s) {
+	setRDSstation(s) {
 		let slots = (s.length+3) / 4;
 
 		let sOffset = 0;
@@ -309,7 +309,7 @@ class Si4713Driver extends LibCommon.device {
 		}
 	}
 
-	setRDSBuffer(s) {
+	setRDSbuffer(s) {
 		let slots = (s.length+3) / 4;
 
 		let sOffset = 0;
@@ -346,9 +346,8 @@ class Si4713Driver extends LibCommon.device {
 			let cSInterval = setInterval(() => {
 				let buffer = Buffer.alloc(1); //new buffer to alloc
 				let amountBytes = iI.i2cReadSync(this.i2caddr, 1, buffer); //read a single status byte
-				let res = buffer[0] & status;
-				console.log("res="+res+", amntBytes="+amountBytes);
-				if (res || amountBytes > 0) {
+				debugLog("whenStatusIs byte = "+buffer[0]);
+				if (Number(buffer[0]) == status) {
 					clearInterval(cSInterval);
 					return resolve();
 				}
