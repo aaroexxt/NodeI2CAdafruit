@@ -31,7 +31,6 @@ class Si4713Driver extends LibCommon.device {
 	constructor(pin = -1, real = true, dM = false) {
 		super(("Si4713#"+Math.random().toFixed(3)*1000), 1); //call super to set parameters
 		debugMode = dM; //setup debugMode
-		this.i2cBuffer = []; //instantiate new i2c buffer
 
 		if (real) { //reload with real libraries
 			debugLog("requiring real GPIO lib");
@@ -131,19 +130,21 @@ class Si4713Driver extends LibCommon.device {
 
 	sendCommand(arrayBuffer = -1) {
 		if (typeof buffer != "number") {
-			this.i2cBuffer = Buffer.from(arrayBuffer); //create real buffer
+			let i2cBuffer = Buffer.from(arrayBuffer); //create real buffer
+		} else {
+			console.error("Buffer is a number");
 		}
 
 		if (debugMode) {
-			for (let i=0; i<this.i2cBuffer.length; i++) {
-				debugLog("sending i2c command: "+this.i2cBuffer[i]);
+			for (let i=0; i<i2cBuffer.length; i++) {
+				debugLog("sending i2c command: "+i2cBuffer[i]);
 			}
 		}
 		
 		try {
-			iI.i2cWriteSync(this.i2caddr, this.i2cBuffer.length, this.i2cBuffer); //writes buffer to i2c addr
+			iI.i2cWriteSync(this.i2caddr, i2cBuffer.length, i2cBuffer); //writes buffer to i2c addr
 		} catch(e) {
-			console.error("failed to send i2c command: e="+e);
+			console.error("failed to send i2c buffer: e="+e);
 		}
 	}
 	getRev() {
