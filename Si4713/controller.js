@@ -347,7 +347,7 @@ class Si4713Driver extends LibCommon.device {
 				let buffer = Buffer.alloc(1); //new buffer to alloc
 				let amountBytes = iI.i2cReadSync(this.i2caddr, 1, buffer); //read a single status byte
 				debugLog("whenStatusIs byte = "+buffer[0]);
-				if (Number(buffer[0]) == status) {
+				if (Number(buffer[0]) == status || amountBytes > 0) {
 					clearInterval(cSInterval);
 					return resolve();
 				}

@@ -19,7 +19,7 @@ scanner.scan(0x3, 0x77).then( () => { //needs to happen before device begin/end 
 
 				console.log("Beginning RDS");
 				radio.beginRDS();
-				radio.setRDSStation("AaronRadio");
+				radio.setRDSstation("AaronRadio");
 				radio.setRDSbuffer("Aaron's Radio Station Test");
 
 				var current = 8750;
