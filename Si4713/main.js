@@ -15,7 +15,7 @@ scanner.scan(0x3, 0x77).then( () => { //needs to happen before device begin/end 
 
 			console.log("Setting TX power");
 			radio.setTXpower(115); //setting tx power
-			radio.tuneFM(10190).then( () => {
+			radio.tuneFM(10230).then( () => {
 				console.log("tuned successfully");
 
 				console.log("Beginning RDS");
@@ -23,7 +23,7 @@ scanner.scan(0x3, 0x77).then( () => { //needs to happen before device begin/end 
 				radio.setRDSstation("AaronRadio");
 				radio.setRDSbuffer("Aaron's Radio Station Test");
 
-				var current = 8750;
+				var current = 10000//8750;
 				var max = 10800//10800;
 
 				function measureFreq(f) {
